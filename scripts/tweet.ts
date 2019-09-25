@@ -5,7 +5,7 @@ import Twitter from 'twitter'
 import axios from 'axios'
 
 const previous = require('../data/deployments.json')
-const prevCount = Object.keys(previous).length
+let prevCount = Object.keys(previous).length
 
 const client = new Twitter({
   consumer_key: process.env.CONSUMER_KEY,
@@ -195,11 +195,13 @@ Size: ${parcels} parcel${parcels === 1 ? '' : 's'}
   }
 
   console.log('done ✅')
-
+  console.log('Prev count:', prevCount)
+  console.log('New count:', newCount)
   if (newCount > prevCount) {
+    prevCount = newCount
     try {
       console.log('Count increased to ' + newCount + ' LAND')
-      const text = `There are ${newCount} LAND with content deployed`
+      const text = `There are ${newCount.toLocaleString()} LAND with content deployed on them!`
 
       const status = {
         status: text
@@ -217,6 +219,7 @@ Size: ${parcels} parcel${parcels === 1 ? '' : 's'}
 
 var crontab = require('node-crontab')
 // every 6 hours
+console.log('sabe')
 crontab.scheduleJob('0 */6 * * *', function() {
   console.log('go!')
   main().catch(console.error)
