@@ -4,8 +4,10 @@ import { Coord } from 'decentraland-ui'
 import Twitter from 'twitter'
 import axios from 'axios'
 
-const previous = require('../data/deployments.json')
+let previous = require('../data/deployments.json')
 let prevCount = Object.keys(previous).length
+let lastTweet: number | null = null
+const TWEET_INTERVAL = 7 * 24 * 60 * 60 * 1000 // 1 week
 
 const client = new Twitter({
   consumer_key: process.env.CONSUMER_KEY,
@@ -197,8 +199,14 @@ Size: ${parcels} parcel${parcels === 1 ? '' : 's'}
   console.log('done ✅')
   console.log('Prev count:', prevCount)
   console.log('New count:', newCount)
-  if (newCount > prevCount) {
-    prevCount = newCount
+  const now = Date.now()
+  const time = lastTweet == null ? 0 : lastTweet + TWEET_INTERVAL - now
+  console.log('Last tweet timestamp:', lastTweet)
+  console.log('Min interval:', TWEET_INTERVAL)
+  console.log('Current timestamp:', Date.now())
+  console.log('Time to next tweet:', Math.abs(time / (1000 * 60 * 60)), 'hours')
+
+  if (newCount > prevCount && time < 0) {
     try {
       console.log('Count increased to ' + newCount + ' LAND')
       const text = `There are ${newCount.toLocaleString()} LAND with content deployed on them!`
@@ -214,7 +222,11 @@ Size: ${parcels} parcel${parcels === 1 ? '' : 's'}
     } catch (e) {
       console.log(`Error! ${e.message}`)
     }
+    lastTweet = Date.now()
   }
+
+  previous = deploymentsData
+  prevCount = newCount
 }
 
 var crontab = require('node-crontab')
