@@ -204,7 +204,11 @@ Size: ${parcels} parcel${parcels === 1 ? '' : 's'}
   console.log('Last tweet timestamp:', lastTweet)
   console.log('Min interval:', TWEET_INTERVAL)
   console.log('Current timestamp:', Date.now())
-  console.log('Time to next tweet:', Math.abs(time / (1000 * 60 * 60)), 'hours')
+  console.log(
+    'Time to next tweet:',
+    Math.floor(time / (1000 * 60 * 60)),
+    'hours'
+  )
 
   if (newCount > prevCount && time <= 0) {
     try {
